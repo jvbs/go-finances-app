@@ -23,6 +23,9 @@ export function AppRoutes() {
           height: 88,
           paddingVertical: Platform.OS === "ios" ? 20 : 0,
         },
+        tabBarLabelStyle: {
+          fontFamily: theme.fonts.regular,
+        },
       }}
     >
       <Screen
