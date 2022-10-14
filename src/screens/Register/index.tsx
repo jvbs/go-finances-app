@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Keyboard, Modal, Alert } from "react-native";
 import { Control, FieldValues, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import InputForm from "../../components/Form/InputForm";
 import Button from "../../components/Form/Button";
@@ -29,9 +30,11 @@ export function Register() {
   const [transactionType, setTransactionType] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 
+  const dataKey = "@goFinances:transactions";
+
   const [category, setCategory] = useState({
     key: "category",
-    name: "Categoria",
+    name: "Categorias",
   });
 
   const {
@@ -54,21 +57,49 @@ export function Register() {
     setCategoryModalOpen(true);
   }
 
-  function handleRegister(form: FormData) {
+  async function handleRegister(form: FormData) {
     if (!transactionType) return Alert.alert("Selecione o tipo da transação.");
 
     if (category.key === "category")
       return Alert.alert("Selecione a categoria.");
 
-    const data = {
+    const newTransaction = {
       name: form.name,
       amount: form.amount,
       transactionType,
       category: category.key,
     };
 
-    console.log(data);
+    try {
+      const data = await AsyncStorage.getItem(dataKey);
+      const currentData = data ? JSON.parse(data) : [];
+
+      const formattedData = [...currentData, newTransaction];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(formattedData));
+
+      Alert.alert("Transação computada com sucesso!");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Não foi possível salvar.");
+    }
   }
+
+  useEffect(() => {
+    // o useEffect nao pode ser async, desta forma, cria-se uma funçao
+    async function loadData() {
+      const data = await AsyncStorage.getItem(dataKey);
+      console.log(JSON.parse(data!));
+    }
+
+    loadData();
+
+    // async function removeAllFromStorage() {
+    //   await AsyncStorage.removeItem(dataKey);
+    // }
+
+    // removeAllFromStorage();
+  }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -116,7 +147,7 @@ export function Register() {
             </TransactionTypes>
 
             <CategorySelectButton
-              title="Categorias"
+              title={category.name}
               onPress={handleOpenSelectCategoryModal}
             />
           </Fields>
