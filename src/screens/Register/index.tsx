@@ -4,11 +4,15 @@ import { Control, FieldValues, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import uuid from "react-native-uuid";
+import { useNavigation } from "@react-navigation/native";
 
 import InputForm from "../../components/Form/InputForm";
 import Button from "../../components/Form/Button";
 import TransactionTypeButton from "../../components/Form/TransactionTypeButton";
 import CategorySelectButton from "../../components/Form/CategorySelectButton";
+import { schema } from "./schema";
+import { CategorySelect } from "../CategorySelect";
 
 import {
   Container,
@@ -18,13 +22,15 @@ import {
   Fields,
   TransactionTypes,
 } from "./styles";
-import { CategorySelect } from "../CategorySelect";
-import { schema } from "./schema";
 
 interface FormData {
   name: string;
   amount: string;
 }
+
+type NavigationProps = {
+  navigate: (screen: string) => void;
+};
 
 export function Register() {
   const [transactionType, setTransactionType] = useState("");
@@ -37,9 +43,12 @@ export function Register() {
     name: "Categorias",
   });
 
+  const navigation = useNavigation<NavigationProps>();
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>({ resolver: yupResolver(schema) });
 
@@ -57,6 +66,17 @@ export function Register() {
     setCategoryModalOpen(true);
   }
 
+  function resetForm() {
+    reset();
+    setTransactionType("");
+    setCategory({
+      key: "category",
+      name: "Categorias",
+    });
+
+    navigation.navigate("Listagem");
+  }
+
   async function handleRegister(form: FormData) {
     if (!transactionType) return Alert.alert("Selecione o tipo da transação.");
 
@@ -64,10 +84,12 @@ export function Register() {
       return Alert.alert("Selecione a categoria.");
 
     const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
       transactionType,
       category: category.key,
+      date: new Date(),
     };
 
     try {
@@ -77,6 +99,8 @@ export function Register() {
       const formattedData = [...currentData, newTransaction];
 
       await AsyncStorage.setItem(dataKey, JSON.stringify(formattedData));
+
+      resetForm();
 
       Alert.alert("Transação computada com sucesso!");
     } catch (error) {
