@@ -7,11 +7,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
 
+import { schema } from "./schema";
 import InputForm from "../../components/Form/InputForm";
 import Button from "../../components/Form/Button";
 import TransactionTypeButton from "../../components/Form/TransactionTypeButton";
 import CategorySelectButton from "../../components/Form/CategorySelectButton";
-import { schema } from "./schema";
+
 import { CategorySelect } from "../CategorySelect";
 
 import {
@@ -35,8 +36,6 @@ type NavigationProps = {
 export function Register() {
   const [transactionType, setTransactionType] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-
-  const dataKey = "@goFinances:transactions";
 
   const [category, setCategory] = useState({
     key: "category",
@@ -93,6 +92,8 @@ export function Register() {
     };
 
     try {
+      const dataKey = "@goFinances:transactions";
+
       const data = await AsyncStorage.getItem(dataKey);
       const currentData = data ? JSON.parse(data) : [];
 
@@ -108,22 +109,6 @@ export function Register() {
       Alert.alert("Não foi possível salvar.");
     }
   }
-
-  useEffect(() => {
-    // o useEffect nao pode ser async, desta forma, cria-se uma funçao
-    async function loadData() {
-      const data = await AsyncStorage.getItem(dataKey);
-      console.log(JSON.parse(data!));
-    }
-
-    loadData();
-
-    // async function removeAllFromStorage() {
-    //   await AsyncStorage.removeItem(dataKey);
-    // }
-
-    // removeAllFromStorage();
-  }, []);
 
   return (
     <TouchableWithoutFeedback
