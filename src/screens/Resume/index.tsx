@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { VictoryPie } from "victory-native";
+import { useTheme } from "styled-components";
 
 import { HistoryCard } from "../../components/HistoryCard";
 import { TransactionCardProps } from "../../components/TransactionCard";
 
-import { Container, Header, Title, Content } from "./styles";
+import { Container, Header, Title, Content, ChartContainer } from "./styles";
 import { categories } from "../../utils/categories";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface CategoryData {
   key: string;
   name: string;
-  total: string;
+  total: number;
+  totalStringfied: string;
   color: string;
+  percent: string;
 }
 
 export function Resume() {
   const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>(
     []
   );
+
+  const theme = useTheme();
 
   async function loadData() {
     const dataKey = "@goFinances:transactions";
@@ -26,6 +33,13 @@ export function Resume() {
 
     const expenses = formattedResponse.filter(
       (expense: TransactionCardProps) => expense.type === "negative"
+    );
+
+    const expensesTotal = expenses.reduce(
+      (acumullator: number, expensive: TransactionCardProps) => {
+        return acumullator + Number(expensive.amount);
+      },
+      0
     );
 
     const totalByCategory: CategoryData[] = [];
@@ -39,15 +53,20 @@ export function Resume() {
       });
 
       if (categorySum > 0) {
-        const total = categorySum.toLocaleString("pt-BR", {
+        const totalStringfied = categorySum.toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
         });
+
+        const percent = `${((categorySum / expensesTotal) * 100).toFixed(0)}%`;
+
         totalByCategory.push({
           key: category.key,
           name: category.name,
-          total: total,
+          total: categorySum,
+          totalStringfied,
           color: category.color,
+          percent,
         });
       }
     });
@@ -66,11 +85,28 @@ export function Resume() {
       </Header>
 
       <Content>
+        <ChartContainer>
+          <VictoryPie
+            data={totalByCategories}
+            x="percent"
+            y="total"
+            colorScale={totalByCategories.map((category) => category.color)}
+            labelRadius={50}
+            style={{
+              labels: {
+                fontSize: RFValue(18),
+                fontWeight: "bold",
+                fill: theme.colors.shape,
+              },
+            }}
+          />
+        </ChartContainer>
+
         {totalByCategories.map((item) => (
           <HistoryCard
             key={item.key}
             title={item.name}
-            amount={item.total}
+            amount={item.totalStringfied}
             color={item.color}
           />
         ))}
