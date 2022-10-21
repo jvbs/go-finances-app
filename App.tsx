@@ -17,6 +17,7 @@ import {
 import theme from "./src/global/styles/theme";
 
 import { SignIn } from "./src/screens/SignIn";
+import { AuthContext } from "./src/AuthContext";
 import { AppRoutes } from "./src/routes/app.routes";
 
 export default function App() {
@@ -41,7 +42,9 @@ export default function App() {
             barStyle={"light-content"}
             backgroundColor={theme.colors.primary}
           />
-          <SignIn />
+          <AuthContext.Provider value={["Joao"]}>
+            <SignIn />
+          </AuthContext.Provider>
           {/* <AppRoutes /> */}
         </NavigationContainer>
       </ThemeProvider>
