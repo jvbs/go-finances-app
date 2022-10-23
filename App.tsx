@@ -15,10 +15,8 @@ import {
 } from "@expo-google-fonts/poppins";
 
 import theme from "./src/global/styles/theme";
-
-import { SignIn } from "./src/screens/SignIn";
-import { AuthProvider, useAuth } from "./src/hooks/Auth";
-import { AppRoutes } from "./src/routes/app.routes";
+import { AuthProvider } from "./src/hooks/Auth";
+import { Routes } from "./src/routes";
 
 export default function App() {
   SplashScreen.preventAutoHideAsync();
@@ -37,17 +35,14 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider theme={theme}>
-        <NavigationContainer>
-          <StatusBar
-            barStyle={"light-content"}
-            backgroundColor={theme.colors.primary}
-          />
+        <StatusBar
+          barStyle={"light-content"}
+          backgroundColor={theme.colors.primary}
+        />
 
-          <AuthProvider>
-            <SignIn />
-            {/* <AppRoutes /> */}
-          </AuthProvider>
-        </NavigationContainer>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );
