@@ -27,9 +27,13 @@ export function SignIn() {
     try {
       await signInWithGoogle();
     } catch (error) {
-      Alert.alert("Não foi possível conectar a conta Google");
+      Alert.alert("Erro", "Não foi possível conectar a conta Google");
       console.log(error);
     }
+  }
+
+  function handleSignInWithApple() {
+    Alert.alert("Em breve", "Fique ligado!");
   }
 
   return (
@@ -54,7 +58,11 @@ export function SignIn() {
             svg={GoogleSvg}
             onPress={handleSignInWithGoogle}
           />
-          <SignInSocialButton title="Entrar com Apple" svg={AppleSvg} />
+          <SignInSocialButton
+            title="Entrar com Apple"
+            svg={AppleSvg}
+            onPress={handleSignInWithApple}
+          />
         </FooterWrapper>
       </Footer>
     </Container>
