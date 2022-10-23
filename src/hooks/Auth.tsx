@@ -32,13 +32,10 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   async function signInWithGoogle() {
     try {
-      const CLIENT_ID =
-        "601758631646-bv349o1c56cfp0s2ire03b7icla6rah1.apps.googleusercontent.com";
-      const REDIRECT_URI = "https://auth.expo.io/@jvbs/goFinances";
       const RESPONSE_TYPE = "token";
       const SCOPE = encodeURI("profile email");
 
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
 
       const { type, params } = (await AuthSession.startAsync({
         authUrl,
