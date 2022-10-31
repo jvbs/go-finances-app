@@ -8,8 +8,13 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { addMonths, format, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../../hooks/Auth";
+
 import { HistoryCard } from "../../components/HistoryCard";
 import { TransactionCardProps } from "../../components/TransactionCard";
+
+import { categories } from "../../utils/categories";
 
 import {
   Container,
@@ -23,8 +28,6 @@ import {
   MonthName,
   LoadingContainer,
 } from "./styles";
-import { categories } from "../../utils/categories";
-import { useFocusEffect } from "@react-navigation/native";
 
 interface CategoryData {
   key: string;
@@ -43,6 +46,7 @@ export function Resume() {
   );
 
   const theme = useTheme();
+  const { user } = useAuth();
 
   function handleDateChange(action: "next" | "prev") {
     setIsLoading(true);
@@ -57,7 +61,7 @@ export function Resume() {
   async function loadData() {
     setIsLoading(true);
 
-    const dataKey = "@goFinances:transactions";
+    const dataKey = `@goFinances:transactions_user:${user.id}`;
     const response = await AsyncStorage.getItem(dataKey);
     const formattedResponse = response ? JSON.parse(response) : [];
 
