@@ -8,12 +8,14 @@ import uuid from "react-native-uuid";
 import { useNavigation } from "@react-navigation/native";
 
 import { schema } from "./schema";
+
 import InputForm from "../../components/Form/InputForm";
 import Button from "../../components/Form/Button";
 import TransactionTypeButton from "../../components/Form/TransactionTypeButton";
 import CategorySelectButton from "../../components/Form/CategorySelectButton";
 
 import { CategorySelect } from "../CategorySelect";
+import { useAuth } from "../../hooks/Auth";
 
 import {
   Container,
@@ -36,6 +38,7 @@ type NavigationProps = {
 export function Register() {
   const [transactionType, setTransactionType] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const { user } = useAuth();
 
   const [category, setCategory] = useState({
     key: "category",
@@ -92,7 +95,7 @@ export function Register() {
     };
 
     try {
-      const dataKey = "@goFinances:transactions";
+      const dataKey = `@goFinances:transactions_user:${user.id}`;
       const data = await AsyncStorage.getItem(dataKey);
       const currentData = data ? JSON.parse(data) : [];
 
